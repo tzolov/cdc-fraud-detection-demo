@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  postgres-cdc:
+    image: debezium/example-postgres:0.10
+    container_name: postgres-cdc
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+
+  transaction-generator:
+    image: tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT
+    container_name: transaction-generator
+    ports:
+      - "8384:8384"
+    expose:
+      - "8384"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-cdc:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
+      - server.port=8384
+    depends_on:
+      - postgres-cdc
+    entrypoint: "./wait-for-it.sh -t 180 postgres-cdc:5432 -- java -jar /maven/credit-card-transaction-generator.jar"
+
+  dataflow-cdc-app-import:
+    image: springcloud/openjdk:2.0.0.RELEASE
+    container_name: dataflow-cdc-app-import
+    depends_on:
+      - dataflow-server
+    command: >
+      /bin/sh -c "
+        ./wait-for-it.sh -t 180 dataflow-server:9393;
+        wget -qO- 'http://dataflow-server:9393/apps/source/cdc-debezium/1.0.0.M1' --post-data='uri=https://repo.spring.io/libs-milestone-local/org/springframework/cloud/stream/app/cdc-debezium-source-kafka/1.0.0.M1/cdc-debezium-source-kafka-1.0.0.M1.jar&metadata-uri=https://repo.spring.io/libs-milestone-local/org/springframework/cloud/stream/app/cdc-debezium-source-kafka/1.0.0.M1/cdc-debezium-source-kafka-1.0.0.M1-metadata.jar&force=true';
+        echo 'CDC app imported'"

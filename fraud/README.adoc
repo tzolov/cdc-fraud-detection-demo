@@ -1,0 +1,11 @@
+# Spring Cloud Stream Fraud Applications
+
+---
+
+### fraud-detection processor
+*Description*: TODO
+
+include::spring-cloud-starter-stream-processor-fraud-detection/README.adoc[]
+
+---
+

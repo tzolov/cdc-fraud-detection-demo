@@ -1,0 +1,44 @@
+//tag::ref-doc[]
+= FraudDetection Processor
+
+
+== Options
+
+//tag::configuration-properties[]
+$$tensorflow.expression$$:: $$How to obtain the input data from the input message. If empty it defaults to the input message payload. The headers[myHeaderName] expression to get input data from message's header using myHeaderName as a key.$$ *($$Expression$$, default: `$$<none>$$`)*
+$$tensorflow.mode$$:: $$The outbound message can store the inference result either in the payload or in a header with name outputName. The payload mode (default) stores the inference result in the outbound message payload. The inbound payload is discarded. The header mode stores the inference result in outbound message's header defined by the outputName property. The the inbound message payload is passed through to the outbound such.$$ *($$OutputMode$$, default: `$$<none>$$`, possible values: `payload`,`header`)*
+$$tensorflow.model$$:: $$The location of the pre-trained TensorFlow model file. The file, http and classpath schemas are supported. For archive locations takes the first file with '.pb' extension. Use the URI fragment parameter to specify an exact model name (e.g. https://foo/bar/model.tar.gz#frozen_inference_graph.pb)$$ *($$Resource$$, default: `$$<none>$$`)*
+$$tensorflow.model-fetch$$:: $$The TensorFlow graph model outputs. Comma separate list of TensorFlow operation names to fetch the output Tensors from.$$ *($$List<String>$$, default: `$$<none>$$`)*
+$$tensorflow.output-name$$:: $$The output data key used for the Header modes.$$ *($$String$$, default: `$$result$$`)*
+//end::configuration-properties[]
+
+//end::ref-doc[]
+
+== Build
+
+Build involves two-stages. First build the apps and generate the binder specific app starters projects:
+```
+$ ./mvnw clean install -PgenerateApps
+```
+
+You can find the corresponding binder based projects in the `apps` subfolder. You can then cd into the apps folder:
+
+```
+$ cd apps
+```
+and build all binder projects
+```
+$ ./mvnw clean package
+```
+
+== Examples
+
+```
+java -jar fraud-detection-processor.jar ... use the properties TODO
+```
+
+And here is a example pipeline that uses fraud-detection:
+
+```
+fraud-detection-stream= TODO
+```

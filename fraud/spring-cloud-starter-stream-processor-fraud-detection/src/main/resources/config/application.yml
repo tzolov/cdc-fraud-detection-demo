@@ -1,0 +1,3 @@
+tensorflow:
+  model: classpath:/fraud_detection_graph.pb
+  modelFetch: output
