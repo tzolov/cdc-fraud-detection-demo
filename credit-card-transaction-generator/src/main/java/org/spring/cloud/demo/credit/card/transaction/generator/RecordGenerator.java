@@ -1,8 +1,11 @@
 package org.spring.cloud.demo.credit.card.transaction.generator;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,17 +21,11 @@ public class RecordGenerator {
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	@Autowired
-	public GeneratorControlView mainView;
+	private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-	public RecordGenerator() {
+	public void start(GeneratorControlView mainView) {
 
-	}
-
-	public void start() {
-
-		new Thread(() -> {
-
+		executorService.submit(() -> {
 			Assert.notNull(jdbcTemplate, "not null");
 
 			try {
@@ -39,9 +36,8 @@ public class RecordGenerator {
 				while (mainView.isStopped() == false) {
 					String[] record;
 					int pct = random.nextInt(100) + 1;
-					if (pct >= RecordGenerator.this.mainView.getFraudPercentage()) {
+					if (pct >= mainView.getFraudPercentage()) {
 						record = normalRecords.get(random.nextInt(normalRecords.size()));
-						//RecordGenerator.this.mainView.incrementNormalCount();
 					}
 					else {
 						record = fraudRecords.get(random.nextInt(fraudRecords.size()));
@@ -49,18 +45,14 @@ public class RecordGenerator {
 					}
 					RecordGenerator.this.insertCreditCardTransaction(record);
 
-					Thread.sleep(1000 * (random.nextInt(RecordGenerator.this.mainView.getMaxWaitSecond()) +
-							RecordGenerator.this.mainView.getMinWaitSecond()));
+					Thread.sleep(1000 * (random.nextInt((int) mainView.getMaxWaitSecond()) +
+							mainView.getMinWaitSecond()));
 				}
 			}
-			catch (IOException e) {
+			catch (Exception e) {
 				e.printStackTrace();
 			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		}).start();
+		});
 
 		//List<String> result = jdbcTemplate.query("select \"time\", \"amount\" from \"cdc\".\"credit_card_transaction\"",
 		//		(rs, i) -> rs.getString("time") + " : " + rs.getString("amount") + " \n");

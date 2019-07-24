@@ -10,5 +10,5 @@ In the directory where you downloaded `docker-compose.yml` and `docker-compose.o
 ```
 export DATAFLOW_VERSION=2.1.2.RELEASE
 export SKIPPER_VERSION=2.0.3.RELEASE
-docker-compose -f ./docker-compose.yml -f ./docker-compose.ovveride.yml up
+docker-compose -f ./docker-compose.yml -f ./docker-compose.override.yml up
 ```

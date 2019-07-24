@@ -38,4 +38,5 @@ services:
       /bin/sh -c "
         ./wait-for-it.sh -t 180 dataflow-server:9393;
         wget -qO- 'http://dataflow-server:9393/apps/source/cdc-debezium/1.0.0.M1' --post-data='uri=https://repo.spring.io/libs-milestone-local/org/springframework/cloud/stream/app/cdc-debezium-source-kafka/1.0.0.M1/cdc-debezium-source-kafka-1.0.0.M1.jar&metadata-uri=https://repo.spring.io/libs-milestone-local/org/springframework/cloud/stream/app/cdc-debezium-source-kafka/1.0.0.M1/cdc-debezium-source-kafka-1.0.0.M1-metadata.jar&force=true';
-        echo 'CDC app imported'"
+        wget -qO- 'http://dataflow-server:9393/apps/processor/fraud-detection/1.0.0' --post-data='uri=https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.0.jar&metadata-uri=https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.0-metadata.jar&force=true';
+        echo 'CDC and Fraud apps imported'"

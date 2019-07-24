@@ -1,68 +1,75 @@
 package org.spring.cloud.demo.credit.card.transaction.generator;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author Christian Tzolov
  */
 @Route(value = "generator")
-@SpringComponent
 public class GeneratorControlView extends VerticalLayout {
 
-	@Autowired
+	private NumberField minWaitField;
+	private NumberField maxWaitField;
+	private NumberField fraudPercentageField;
+	private Button startStopButton;
+
 	private RecordGenerator recordGenerator;
 
-	public boolean stopped = true;
+	public AtomicBoolean stopped = new AtomicBoolean(true);
 
-	private Double fraudPercentage = 30d;
+	private AtomicLong fraudPercentage = new AtomicLong(30);
 
-	private int minWaitSecond = 1;
+	private AtomicLong minWaitSecond = new AtomicLong(1);
 
-	private int maxWaitSecond = 10;
+	private AtomicLong maxWaitSecond = new AtomicLong(10);
 
-	public GeneratorControlView() {
+	// Constructor arguments are autowired
+	public GeneratorControlView(RecordGenerator recordGenerator) {
 
-		NumberField minWaitField = new NumberField("Min Wait");
+		this.recordGenerator = recordGenerator;
+
+		minWaitField = new NumberField("Min Wait");
 		minWaitField.setValue(1d);
 		minWaitField.setMin(0);
 		minWaitField.setMax(10);
 		minWaitField.setHasControls(true);
 		minWaitField.setSuffixComponent(new Span("sec"));
-		minWaitField.addValueChangeListener(event -> this.minWaitSecond = event.getValue().intValue());
+		minWaitField.addValueChangeListener(event -> this.minWaitSecond.getAndSet(event.getValue().longValue()));
 
-		NumberField maxWaitField = new NumberField("Max Wait");
+		maxWaitField = new NumberField("Max Wait");
 		maxWaitField.setValue(10d);
 		maxWaitField.setMin(1);
 		maxWaitField.setMax(10);
 		maxWaitField.setHasControls(true);
 		maxWaitField.setSuffixComponent(new Span("sec"));
 		maxWaitField.addValueChangeListener(event -> {
-			this.maxWaitSecond = event.getValue().intValue();
+			this.maxWaitSecond.getAndSet(event.getValue().longValue());
 			minWaitField.setMax(event.getValue() - 1);
 			minWaitField.setValue(Math.min(event.getValue() - 1, minWaitField.getValue()));
 		});
 
-		NumberField fraudPercentageField = new NumberField("Fraud Ratio");
+		fraudPercentageField = new NumberField("Fraud Ratio");
 		fraudPercentageField.setValue(30d);
 		fraudPercentageField.setMin(0);
 		fraudPercentageField.setMax(100);
 		fraudPercentageField.setHasControls(true);
 		fraudPercentageField.setStep(5);
 		fraudPercentageField.setSuffixComponent(new Span("%"));
-		fraudPercentageField.addValueChangeListener(event -> this.fraudPercentage = event.getValue());
+		fraudPercentageField.addValueChangeListener(
+				event -> this.fraudPercentage.getAndSet(event.getValue().longValue()));
 
-		Button startStopButton = new Button("Start", VaadinIcon.START_COG.create());
+		startStopButton = new Button("Start", VaadinIcon.START_COG.create());
 		startStopButton.addClickListener(e -> {
-			this.stopped = !this.stopped;
-			if (this.stopped == true) {
+			this.stopped.getAndSet(!this.stopped.get());
+			if (this.stopped.get()) {
 				startStopButton.setIcon(VaadinIcon.START_COG.create());
 				startStopButton.setText("Start");
 			}
@@ -70,7 +77,7 @@ public class GeneratorControlView extends VerticalLayout {
 				startStopButton.setIcon(VaadinIcon.STOP.create());
 				startStopButton.setText("Stop");
 				try {
-					this.recordGenerator.start();
+					this.recordGenerator.start(this);
 				}
 				catch (Exception ex) {
 					ex.printStackTrace();
@@ -84,19 +91,19 @@ public class GeneratorControlView extends VerticalLayout {
 		this.add(startStopButton);
 	}
 
-	public Double getFraudPercentage() {
-		return fraudPercentage;
+	public long getFraudPercentage() {
+		return fraudPercentage.get();
 	}
 
 	public boolean isStopped() {
-		return stopped;
+		return stopped.get();
 	}
 
-	public int getMinWaitSecond() {
-		return minWaitSecond;
+	public long getMinWaitSecond() {
+		return minWaitSecond.get();
 	}
 
-	public int getMaxWaitSecond() {
-		return maxWaitSecond;
+	public long getMaxWaitSecond() {
+		return maxWaitSecond.get();
 	}
 }
