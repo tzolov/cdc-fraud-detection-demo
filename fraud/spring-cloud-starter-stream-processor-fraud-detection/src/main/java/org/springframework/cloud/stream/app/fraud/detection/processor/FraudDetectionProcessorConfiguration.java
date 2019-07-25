@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +51,8 @@ import org.springframework.util.Assert;
 @Import(TensorflowCommonProcessorConfiguration.class)
 public class FraudDetectionProcessorConfiguration {
 
+	public final static String PROCESSOR_CONTEXT_INPUT_RECORD = "PROCESSOR_CONTEXT_INPUT_RECORD";
+
 	private static final Log logger = LogFactory.getLog(FraudDetectionProcessorConfiguration.class);
 
 	@Autowired
@@ -79,10 +82,18 @@ public class FraudDetectionProcessorConfiguration {
 
 			float[][] val = resultTensors.get("output").copyTo(new float[1][2]);
 
-			if ((val[0][1] < 0.999 && val[0][0] >= 0.999)) {
-				return "FRAUD";
+			String result = (val[0][1] < 0.999 && val[0][0] >= 0.999) ? "FRAUD" : "NORMAL";
+			Map<String, Object> outputJsonMap = new HashMap<>();
+			//outputJsonMap.put("input", processorContext.get(PROCESSOR_CONTEXT_INPUT_RECORD));
+			outputJsonMap.put("detection", result);
+
+			try {
+				return new ObjectMapper().writeValueAsString(outputJsonMap);
 			}
-			return "NORMAL";
+			catch (JsonProcessingException e) {
+				throw new RuntimeException("Failed to generate JSON output", e);
+			}
+
 		}
 	}
 
@@ -95,7 +106,6 @@ public class FraudDetectionProcessorConfiguration {
 				Map<String, Number> cdcEntryMap = null;
 
 				if (input instanceof byte[]) {
-					System.out.println(new String((byte[]) input));
 					cdcEntryMap = objectMapper.readValue((byte[]) input, Map.class);
 				}
 				else if (input instanceof String) {
@@ -106,7 +116,7 @@ public class FraudDetectionProcessorConfiguration {
 				}
 
 				if (cdcEntryMap != null) {
-					//processorContext.put(PROCESSOR_CONTEXT_TWEET_JSON_MAP, tweetJsonMap);
+					//processorContext.put(PROCESSOR_CONTEXT_INPUT_RECORD, new String((byte[]) input));
 					return getStringObjectMap(cdcEntryMap);
 				}
 

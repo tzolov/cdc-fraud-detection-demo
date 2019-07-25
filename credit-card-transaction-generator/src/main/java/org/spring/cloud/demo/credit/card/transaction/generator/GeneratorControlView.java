@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,11 +16,6 @@ import com.vaadin.flow.router.Route;
  */
 @Route(value = "generator")
 public class GeneratorControlView extends VerticalLayout {
-
-	private NumberField minWaitField;
-	private NumberField maxWaitField;
-	private NumberField fraudPercentageField;
-	private Button startStopButton;
 
 	private RecordGenerator recordGenerator;
 
@@ -36,7 +32,7 @@ public class GeneratorControlView extends VerticalLayout {
 
 		this.recordGenerator = recordGenerator;
 
-		minWaitField = new NumberField("Min Wait");
+		NumberField minWaitField = new NumberField("Min Wait");
 		minWaitField.setValue(1d);
 		minWaitField.setMin(0);
 		minWaitField.setMax(10);
@@ -44,7 +40,7 @@ public class GeneratorControlView extends VerticalLayout {
 		minWaitField.setSuffixComponent(new Span("sec"));
 		minWaitField.addValueChangeListener(event -> this.minWaitSecond.getAndSet(event.getValue().longValue()));
 
-		maxWaitField = new NumberField("Max Wait");
+		NumberField maxWaitField = new NumberField("Max Wait");
 		maxWaitField.setValue(10d);
 		maxWaitField.setMin(1);
 		maxWaitField.setMax(10);
@@ -56,7 +52,7 @@ public class GeneratorControlView extends VerticalLayout {
 			minWaitField.setValue(Math.min(event.getValue() - 1, minWaitField.getValue()));
 		});
 
-		fraudPercentageField = new NumberField("Fraud Ratio");
+		NumberField fraudPercentageField = new NumberField("Fraud Ratio");
 		fraudPercentageField.setValue(30d);
 		fraudPercentageField.setMin(0);
 		fraudPercentageField.setMax(100);
@@ -66,7 +62,7 @@ public class GeneratorControlView extends VerticalLayout {
 		fraudPercentageField.addValueChangeListener(
 				event -> this.fraudPercentage.getAndSet(event.getValue().longValue()));
 
-		startStopButton = new Button("Start", VaadinIcon.START_COG.create());
+		Button startStopButton = new Button("Start", VaadinIcon.START_COG.create());
 		startStopButton.addClickListener(e -> {
 			this.stopped.getAndSet(!this.stopped.get());
 			if (this.stopped.get()) {
@@ -85,6 +81,7 @@ public class GeneratorControlView extends VerticalLayout {
 			}
 		});
 
+		this.add(new H3("Credit Card Transaction Generator"));
 		this.add(minWaitField);
 		this.add(maxWaitField);
 		this.add(fraudPercentageField);

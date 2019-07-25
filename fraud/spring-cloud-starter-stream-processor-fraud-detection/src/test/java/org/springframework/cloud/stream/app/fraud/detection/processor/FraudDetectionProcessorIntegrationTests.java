@@ -74,7 +74,7 @@ public abstract class FraudDetectionProcessorIntegrationTests {
 			Message<?> received = messageCollector.forChannel(channels.output()).poll();
 
 			Assert.assertNotNull(received);
-			Assert.assertEquals("NORMAL", received.getPayload());
+			Assert.assertEquals("{\"detection\":\"NORMAL\"}", received.getPayload());
 
 			Object payloadFraud = ("{\"time\":406, \"v1\":-2.3122265423263, \"v2\":1.95199201064158, \"v3\":-1.60985073229769, " +
 					"\"v4\":3.9979055875468, \"v5\":-0.522187864667764, \"v6\":-1.42654531920595, \"v7\":-2.53738730624579, " +
@@ -90,7 +90,7 @@ public abstract class FraudDetectionProcessorIntegrationTests {
 			received = messageCollector.forChannel(channels.output()).poll();
 
 			Assert.assertNotNull(received);
-			Assert.assertEquals("FRAUD", received.getPayload());
+			Assert.assertEquals("{\"detection\":\"FRAUD\"}", received.getPayload());
 
 		}
 	}
