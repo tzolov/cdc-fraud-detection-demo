@@ -32,6 +32,7 @@ public class RecordGenerator {
 	public static String[] columns = new String[] { "Time", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10",
 			"V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20", "V21", "V22", "V23", "V24", "V25",
 			"V26", "V27", "V28", "Amount", "Class" };
+
 	private final List<String[]> normalRecords;
 	private final List<String[]> fraudRecords;
 
@@ -45,8 +46,28 @@ public class RecordGenerator {
 
 	public RecordGenerator() {
 		this.executorService = Executors.newSingleThreadExecutor();
-		this.normalRecords = readCsv("classpath:/data/credit-card-normal.csv", true);
-		this.fraudRecords = readCsv("classpath:/data/credit-card-fraud.csv", true);
+		this.normalRecords = readCsv("classpath:/data/credit-card-normal.csv");
+		this.fraudRecords = readCsv("classpath:/data/credit-card-fraud.csv");
+	}
+
+	private List<String[]> readCsv(String csvFilePath) {
+		try {
+			Resource csvResource = new DefaultResourceLoader().getResource(csvFilePath);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(csvResource.getInputStream()));
+
+			List<String[]> list = new ArrayList<>();
+
+			while (reader.ready()) {
+				String[] fieldStr = reader.readLine().split(",");
+				Arrays.copyOf(fieldStr, fieldStr.length - 1); // Drop the Class column
+				list.add(Arrays.copyOf(fieldStr, fieldStr.length - 1));
+			}
+			reader.close();
+			return list;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@PostConstruct
@@ -63,74 +84,6 @@ public class RecordGenerator {
 		this.jdbcTemplate.execute(createSchemaScript);
 	}
 
-	public void start(GeneratorControlView mainView) {
-
-		this.executorService.submit(() -> {
-			Assert.notNull(jdbcTemplate, "not null");
-
-			try {
-				Random random = new Random();
-				while (mainView.isStopped() == false) {
-					String[] record;
-					int pct = random.nextInt(100) + 1;
-					if (pct >= mainView.getFraudPercentage()) {
-						record = normalRecords.get(random.nextInt(normalRecords.size()));
-					}
-					else {
-						record = fraudRecords.get(random.nextInt(fraudRecords.size()));
-						//RecordGenerator.this.mainView.incrementFraudCount();
-					}
-					RecordGenerator.this.insertCreditCardTransaction(record);
-
-					Thread.sleep(1000 * (random.nextInt((int) mainView.getMaxWaitSecond()) +
-							mainView.getMinWaitSecond()));
-				}
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
-
-		//List<String> result = jdbcTemplate.query("select \"time\", \"amount\" from \"cdc\".\"credit_card_transaction\"",
-		//		(rs, i) -> rs.getString("time") + " : " + rs.getString("amount") + " \n");
-		//
-		//System.out.println(result);
-
-	}
-
-	private List<String[]> readCsv(String csvFilePath, boolean dropHeader) {
-		try {
-			Resource csvResource = new DefaultResourceLoader().getResource(csvFilePath);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(csvResource.getInputStream()));
-
-			if (dropHeader) {
-				reader.readLine(); //header
-			}
-
-			List<String[]> list = new ArrayList<>();
-
-			while (reader.ready()) {
-				String[] fieldStr = reader.readLine().split(",");
-				Arrays.copyOf(fieldStr, fieldStr.length - 1);
-				list.add(Arrays.copyOf(fieldStr, fieldStr.length - 1));
-			}
-			return list;
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void insertCreditCardTransaction(String... record) {
-		Assert.isTrue(record.length == columns.length - 1,
-				"Incorrect number of columns in record: " + record.length);
-
-		jdbcTemplate.execute("INSERT INTO \"cdc\".\"credit_card_transaction\" (\"time\",\"v1\",\"v2\",\"v3\",\"v4\",\"v5\"," +
-				"\"v6\",\"v7\",\"v8\",\"v9\",\"v10\",\"v11\",\"v12\",\"v13\",\"v14\",\"v15\",\"v16\",\"v17\",\"v18\"" +
-				",\"v19\",\"v20\",\"v21\",\"v22\",\"v23\",\"v24\",\"v25\",\"v26\",\"v27\",\"v28\",\"amount\") " +
-				"VALUES (" + String.join(",", record) + ")");
-	}
-
 	private String getResourceAsString(String uri) {
 		try {
 			return IOUtils.toString(new DefaultResourceLoader().getResource(uri).getInputStream(), Charset.forName("UTF8"));
@@ -138,5 +91,37 @@ public class RecordGenerator {
 		catch (IOException e) {
 			throw new RuntimeException("Failed to retrieve resource from URI:" + uri, e);
 		}
+	}
+
+	public void start(GeneratorControlView mainView) {
+
+		this.executorService.submit(() -> {
+			try {
+				Random random = new Random();
+				while (mainView.isStopped() == false) {
+					if (random.nextInt(100) >= mainView.getFraudPercentage()) {
+						insertTransaction(normalRecords.get(random.nextInt(normalRecords.size())));
+					}
+					else {
+						insertTransaction(fraudRecords.get(random.nextInt(fraudRecords.size())));
+					}
+
+					Thread.sleep(1000 * (mainView.getMinWaitSecond() +
+							random.nextInt((int) mainView.getMaxWaitSecond())));
+				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private void insertTransaction(String... record) {
+		Assert.isTrue(record.length == columns.length - 1,
+				"Incorrect number of columns in record: " + record.length);
+		jdbcTemplate.execute("INSERT INTO \"cdc\".\"credit_card_transaction\" (\"time\",\"v1\",\"v2\",\"v3\",\"v4\",\"v5\"," +
+				"\"v6\",\"v7\",\"v8\",\"v9\",\"v10\",\"v11\",\"v12\",\"v13\",\"v14\",\"v15\",\"v16\",\"v17\",\"v18\"" +
+				",\"v19\",\"v20\",\"v21\",\"v22\",\"v23\",\"v24\",\"v25\",\"v26\",\"v27\",\"v28\",\"amount\") " +
+				"VALUES (" + String.join(",", record) + ")");
 	}
 }
