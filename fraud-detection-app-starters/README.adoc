@@ -1,17 +1,14 @@
 # Spring Cloud Stream Fraud Applications
 
-Custom https://cloud.spring.io/spring-cloud-stream-app-starters/[Spring Cloud App Starter] that customizes the https://docs.spring.io/spring-cloud-stream-app-starters/docs/Einstein.SR3/reference/htmlsingle/#spring-cloud-stream-modules-tensorflow-processor[TensorFlow Processor] to allow using a pre-trained Tensorflow model created with by the https://www.kaggle.com/currie32/predicting-fraud-with-tensorflow[Credit Card Fraud Detection Tensorflow] solution.
+Custom https://cloud.spring.io/spring-cloud-stream-app-starters/[Spring Cloud App Starter] that extends the https://docs.spring.io/spring-cloud-stream-app-starters/docs/Einstein.SR3/reference/htmlsingle/#spring-cloud-stream-modules-tensorflow-processor[TensorFlow Processor] to support a specific Tensorflow model build for the the https://www.kaggle.com/currie32/predicting-fraud-with-tensorflow[Credit Card Fraud Detection] solution.
 
-A pre-trained model is bundled with this project at https://github.com/tzolov/cdc-fraud-detection-demo/blob/master/fraud-detection-app-starters/spring-cloud-starter-stream-processor-fraud-detection/src/main/resources/fraud_detection_graph.pb[fraud_detection_graph.pb].
+A pre-trained, binary model is already bundled with this project at https://github.com/tzolov/cdc-fraud-detection-demo/blob/master/fraud-detection-app-starters/spring-cloud-starter-stream-processor-fraud-detection/src/main/resources/fraud_detection_graph.pb[fraud_detection_graph.pb]. To (re)train the model you can use the following python script: https://github.com/tzolov/cdc-fraud-detection-demo/blob/master/fraud-detection-app-starters/spring-cloud-starter-stream-processor-fraud-detection/model/train-model.py[train-model.py]. Later is a direct copy of the https://www.kaggle.com/currie32/predicting-fraud-with-tensorflow[original Kaggle solution], customized to export the trained model in a Protobuf `fraud_detection_graph.pb` file.
 
-Use the following python script to (re)train and export the model yourself: file://./spring-cloud-starter-stream-processor-fraud-detection/model/train-model.py[train-model.py] . Later is direct copy of the original Kaggle solution (above) extended with following lines to allow exporting the final model as Protobuf `fraud_detection_graph.pb` file.
-
-
-The Fraud Detection Processor expects input json messages in the following format:
+The Fraud Detection Processor expects an input JSON messages in the following format:
 
 ```
 {
- "time":403,
+ "time":453,
  "v1":1.13154130503628,
  "v2":-0.174361326933011,
  ... ,
@@ -20,12 +17,10 @@ The Fraud Detection Processor expects input json messages in the following forma
  }
 ```
 
-The format strictly matches the column names that types of the original dataset https://www.kaggle.com/mlg-ulb/creditcardfraud
+This format strictly matches the column names that types of the original dataset: https://www.kaggle.com/mlg-ulb/creditcardfraud
 
-Only the `Class` column is intentionally removed as we don't know in advance if the input transaction is fraud or not.
- Instead it is processor's responsibility to decide by evaluating the input transaction through the pre-trained Tensorflow model.
-
-The out put result is a single json message, that can be either: `{ "detection":"FRAUD" }` or `{ "detection":"NORMAL" }`
+Only the `Class` column is intentionally removed, because the fraud/normal status of the input transaction is unknown in advance!
+ Instead the fraud-detection processor evaluates result using the pre-trained Tensorflow model. The output result is a single json message, that can be either: `{ "detection":"FRAUD" }` or `{ "detection":"NORMAL" }`
 
 
 ---
