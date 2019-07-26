@@ -103,6 +103,11 @@ Publish docker image to DockerHub:
 ./mvnw  docker:push
 ```
 
+Run the jar locally (first start the posgress database as explained in the next section):
+
+```
+java -jar ./target/credit-card-transaction-generator-0.0.1-SNAPSHOT.jar --spring.datasource.driver-class-name=org.postgresql.Driver --spring.datasource.url=jdbc:postgresql://localhost:5432/postgres --spring.datasource.username=postgres --spring.datasource.password=postgres
+```
 #### Testing
 
 Start local Postgres:
