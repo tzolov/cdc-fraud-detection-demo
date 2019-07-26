@@ -2,15 +2,10 @@
 
 Custom https://cloud.spring.io/spring-cloud-stream-app-starters/[Spring Cloud App Starter] that customizes the https://docs.spring.io/spring-cloud-stream-app-starters/docs/Einstein.SR3/reference/htmlsingle/#spring-cloud-stream-modules-tensorflow-processor[TensorFlow Processor] to allow using a pre-trained Tensorflow model created with by the https://www.kaggle.com/currie32/predicting-fraud-with-tensorflow[Credit Card Fraud Detection Tensorflow] solution.
 
-A pre-trained model is bundled with this project at
+A pre-trained model is bundled with this project at https://github.com/tzolov/cdc-fraud-detection-demo/blob/master/fraud-detection-app-starters/spring-cloud-starter-stream-processor-fraud-detection/src/main/resources/fraud_detection_graph.pb[fraud_detection_graph.pb].
 
-Use the following python script to (re)train and export the model yourself: file://./spring-cloud-starter-stream-processor-fraud-detection/model/train-model.py[train-model.py] . Later is direct copy of the original Kaggle solution (above) extended with following lines to allow exporting the final model as Protobuf `fraud_detection_graph.pb` file:
+Use the following python script to (re)train and export the model yourself: file://./spring-cloud-starter-stream-processor-fraud-detection/model/train-model.py[train-model.py] . Later is direct copy of the original Kaggle solution (above) extended with following lines to allow exporting the final model as Protobuf `fraud_detection_graph.pb` file.
 
-```
- minimal_graph = convert_variables_to_constants(sess, sess.graph.as_graph_def(), ['output'])
- tf.train.write_graph(minimal_graph, SAVE_DIR, './model/fraud_detection_graph.pb', as_text=False)
- tf.train.write_graph(minimal_graph, SAVE_DIR, './model/fraud_detection_graph.txt', as_text=True)
-```
 
 The Fraud Detection Processor expects input json messages in the following format:
 
@@ -30,19 +25,7 @@ The format strictly matches the column names that types of the original dataset 
 Only the `Class` column is intentionally removed as we don't know in advance if the input transaction is fraud or not.
  Instead it is processor's responsibility to decide by evaluating the input transaction through the pre-trained Tensorflow model.
 
- The out put result is a signle json message, that can be either:
-
-```
-{
- "detection":"FRAUD"
- }
-```
-
-```
-{
- "detection":"NORMAL"
- }
-```
+The out put result is a single json message, that can be either: `{ "detection":"FRAUD" }` or `{ "detection":"NORMAL" }`
 
 
 ---
