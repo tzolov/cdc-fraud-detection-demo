@@ -11,6 +11,12 @@
   ],
   "__requires": [
     {
+      "type": "panel",
+      "id": "alertlist",
+      "name": "Alert List",
+      "version": "5.0.0"
+    },
+    {
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
@@ -73,127 +79,6 @@
   ],
   "panels": [
     {
-      "cards": {
-        "cardPadding": null,
-        "cardRound": 3
-      },
-      "color": {
-        "cardColor": "#e24d42",
-        "colorScale": "linear",
-        "colorScheme": "interpolateReds",
-        "exponent": 0.5,
-        "max": null,
-        "min": null,
-        "mode": "spectrum"
-      },
-      "dataFormat": "timeseries",
-      "gridPos": {
-        "h": 7,
-        "w": 14,
-        "x": 0,
-        "y": 0
-      },
-      "heatmap": {},
-      "highlightCards": true,
-      "id": 6,
-      "legend": {
-        "show": true
-      },
-      "links": [],
-      "targets": [
-        {
-          "expr": "rate(credit_total{fraud=\"FRAUD\"}[60s])",
-          "format": "heatmap",
-          "hide": false,
-          "instant": false,
-          "intervalFactor": 1,
-          "legendFormat": "FRAUD",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(credit_total{fraud=\"NORMAL\"}[60s])",
-          "format": "heatmap",
-          "hide": true,
-          "instant": false,
-          "intervalFactor": 1,
-          "legendFormat": "{{fraud}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Fraud Heatmap",
-      "tooltip": {
-        "show": true,
-        "showHistogram": true
-      },
-      "transparent": true,
-      "type": "heatmap",
-      "xAxis": {
-        "show": true
-      },
-      "xBucketNumber": null,
-      "xBucketSize": null,
-      "yAxis": {
-        "decimals": null,
-        "format": "short",
-        "logBase": 1,
-        "max": null,
-        "min": "0",
-        "show": true,
-        "splitFactor": null
-      },
-      "yBucketBound": "auto",
-      "yBucketNumber": 5,
-      "yBucketSize": null
-    },
-    {
-      "aliasColors": {
-        "FRAUD": "#e24d42",
-        "NORMAL": "#508642"
-      },
-      "breakPoint": "50%",
-      "cacheTimeout": null,
-      "combine": {
-        "label": "Others",
-        "threshold": 0
-      },
-      "datasource": "${DS_SCDFPROMETHEUS}",
-      "fontSize": "80%",
-      "format": "short",
-      "gridPos": {
-        "h": 7,
-        "w": 6,
-        "x": 14,
-        "y": 0
-      },
-      "id": 2,
-      "interval": null,
-      "legend": {
-        "percentage": true,
-        "show": true,
-        "values": true
-      },
-      "legendType": "Under graph",
-      "links": [],
-      "maxDataPoints": 3,
-      "nullPointMode": "connected",
-      "pieType": "pie",
-      "strokeWidth": 1,
-      "targets": [
-        {
-          "expr": "sort_desc(topk(10, sum(credit_total) by(fraud)))",
-          "format": "time_series",
-          "instant": true,
-          "intervalFactor": 1,
-          "legendFormat": "{{fraud}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Fraud Ratio",
-      "transparent": true,
-      "type": "grafana-piechart-panel",
-      "valueName": "current"
-    },
-    {
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
@@ -202,6 +87,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
+      "description": "Total number of Normal transactions",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -211,9 +97,9 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 3,
-        "x": 20,
+        "x": 0,
         "y": 0
       },
       "id": 9,
@@ -260,8 +146,8 @@
         }
       ],
       "thresholds": "",
-      "title": "Normal  Tx Count",
-      "transparent": true,
+      "title": "Normal  Count",
+      "transparent": false,
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -274,6 +160,127 @@
       "valueName": "avg"
     },
     {
+      "aliasColors": {
+        "FRAUD": "#e24d42",
+        "NORMAL": "#508642"
+      },
+      "breakPoint": "50%",
+      "cacheTimeout": null,
+      "combine": {
+        "label": "Others",
+        "threshold": 0
+      },
+      "datasource": "${DS_SCDFPROMETHEUS}",
+      "fontSize": "80%",
+      "format": "short",
+      "gridPos": {
+        "h": 8,
+        "w": 5,
+        "x": 3,
+        "y": 0
+      },
+      "id": 2,
+      "interval": null,
+      "legend": {
+        "percentage": true,
+        "show": true,
+        "values": true
+      },
+      "legendType": "Under graph",
+      "links": [],
+      "maxDataPoints": 3,
+      "nullPointMode": "connected",
+      "pieType": "donut",
+      "strokeWidth": 1,
+      "targets": [
+        {
+          "expr": "sort_desc(topk(10, sum(credit_total) by(fraud)))",
+          "format": "time_series",
+          "instant": true,
+          "intervalFactor": 1,
+          "legendFormat": "{{fraud}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Fraud Ratio",
+      "transparent": false,
+      "type": "grafana-piechart-panel",
+      "valueName": "current"
+    },
+    {
+      "cards": {
+        "cardPadding": null,
+        "cardRound": 3
+      },
+      "color": {
+        "cardColor": "#e24d42",
+        "colorScale": "linear",
+        "colorScheme": "interpolateReds",
+        "exponent": 0.5,
+        "max": null,
+        "min": null,
+        "mode": "spectrum"
+      },
+      "dataFormat": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 8,
+        "y": 0
+      },
+      "heatmap": {},
+      "highlightCards": true,
+      "id": 6,
+      "legend": {
+        "show": true
+      },
+      "links": [],
+      "targets": [
+        {
+          "expr": "rate(credit_total{fraud=\"FRAUD\"}[60s])",
+          "format": "heatmap",
+          "hide": false,
+          "instant": false,
+          "intervalFactor": 1,
+          "legendFormat": "FRAUD",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(credit_total{fraud=\"NORMAL\"}[60s])",
+          "format": "heatmap",
+          "hide": true,
+          "instant": false,
+          "intervalFactor": 1,
+          "legendFormat": "{{fraud}}",
+          "refId": "B"
+        }
+      ],
+      "title": "Fraud  Rate Heatmap",
+      "tooltip": {
+        "show": true,
+        "showHistogram": true
+      },
+      "transparent": false,
+      "type": "heatmap",
+      "xAxis": {
+        "show": true
+      },
+      "xBucketNumber": null,
+      "xBucketSize": null,
+      "yAxis": {
+        "decimals": null,
+        "format": "short",
+        "logBase": 1,
+        "max": null,
+        "min": "0",
+        "show": true,
+        "splitFactor": null
+      },
+      "yBucketBound": "auto",
+      "yBucketNumber": 5,
+      "yBucketSize": null
+    },
+    {
       "cacheTimeout": null,
       "colorBackground": false,
       "colorValue": false,
@@ -282,6 +289,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#e24d42"
       ],
+      "description": "Total number of Fraud transactions",
       "format": "none",
       "gauge": {
         "maxValue": 100,
@@ -291,10 +299,10 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 3,
-        "x": 20,
-        "y": 3
+        "x": 0,
+        "y": 4
       },
       "id": 10,
       "interval": null,
@@ -340,8 +348,8 @@
         }
       ],
       "thresholds": "",
-      "title": "Fraud  Tx Count",
-      "transparent": true,
+      "title": "Fraud Count",
+      "transparent": false,
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -354,6 +362,62 @@
       "valueName": "avg"
     },
     {
+      "dashboardFilter": "",
+      "dashboardTags": [],
+      "folderId": null,
+      "gridPos": {
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
+      "id": 12,
+      "limit": "10",
+      "links": [],
+      "nameFilter": "",
+      "onlyAlertsOnDashboard": true,
+      "show": "changes",
+      "sortOrder": 1,
+      "stateFilter": [],
+      "title": "Fraud Alerts",
+      "transparent": true,
+      "type": "alertlist"
+    },
+    {
+      "alert": {
+        "conditions": [
+          {
+            "evaluator": {
+              "params": [
+                3
+              ],
+              "type": "gt"
+            },
+            "operator": {
+              "type": "and"
+            },
+            "query": {
+              "params": [
+                "A",
+                "1m",
+                "now"
+              ]
+            },
+            "reducer": {
+              "params": [],
+              "type": "avg"
+            },
+            "type": "query"
+          }
+        ],
+        "executionErrorState": "alerting",
+        "for": "5m",
+        "frequency": "1m",
+        "handler": 1,
+        "name": "Fraud / Normal Rate alert",
+        "noDataState": "no_data",
+        "notifications": []
+      },
       "aliasColors": {
         "FRAUD": "#e24d42",
         "NORMAL": "#508642",
@@ -365,20 +429,24 @@
       "dashes": false,
       "fill": 1,
       "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 7
+        "h": 10,
+        "w": 18,
+        "x": 6,
+        "y": 8
       },
       "id": 7,
       "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
         "show": true,
         "total": false,
-        "values": false
+        "values": true
       },
       "lines": true,
       "linewidth": 1,
@@ -408,7 +476,15 @@
           "refId": "B"
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 3
+        }
+      ],
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
@@ -490,5 +566,5 @@
   "timezone": "",
   "title": "Credit Card Fraud Analysis",
   "uid": "FkRxlYHZz",
-  "version": 9
+  "version": 10
 }
