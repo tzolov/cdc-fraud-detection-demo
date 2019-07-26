@@ -20,11 +20,7 @@ import org.springframework.core.io.Resource;
  */
 public class CsvUtils {
 
-	public static String[] columns = new String[] { "Time", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10",
-			"V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20", "V21", "V22", "V23", "V24", "V25",
-			"V26", "V27", "V28", "Amount", "Class" };
-
-	public static int CLASS_INDEX = columns.length - 1;
+	public static int CLASS_INDEX = RecordGenerator.columns.length - 1;
 
 	public static void main(String[] args) throws IOException {
 		//convertCsvToJsonFile("classpath:/data/creditcard.csv");
@@ -46,9 +42,9 @@ public class CsvUtils {
 			String line = reader.readLine();
 			String[] fieldStr = line.split(",");
 			String jsonLine = "";
-			for (int i = 0; i < columns.length; i++) {
-				jsonLine = jsonLine + "\"" + columns[i] + "\":" + fieldStr[i];
-				if (i != columns.length - 1) {
+			for (int i = 0; i < RecordGenerator.columns.length; i++) {
+				jsonLine = jsonLine + "\"" + RecordGenerator.columns[i] + "\":" + fieldStr[i];
+				if (i != RecordGenerator.columns.length - 1) {
 					jsonLine = jsonLine + ", ";
 				}
 			}
@@ -64,30 +60,12 @@ public class CsvUtils {
 		bos.close();
 	}
 
-	public static List<String[]> readCsv(String csvFilePath, boolean dropHeader) throws IOException {
-		Resource csvResource = new DefaultResourceLoader().getResource(csvFilePath);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(csvResource.getInputStream()));
-
-		if (dropHeader) {
-			reader.readLine(); //header
-		}
-
-		List<String[]> list = new ArrayList<>();
-
-		while (reader.ready()) {
-			String[] fieldStr = reader.readLine().split(",");
-			Arrays.copyOf(fieldStr, fieldStr.length - 1);
-			list.add(Arrays.copyOf(fieldStr, fieldStr.length - 1));
-		}
-		return list;
-	}
-
 	private static void extractFraudRecords(String csvFilePath) throws IOException {
 		Resource csvResource = new DefaultResourceLoader().getResource(csvFilePath);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(csvResource.getInputStream()));
 
 		BufferedOutputStream bos = new BufferedOutputStream(
-				new FileOutputStream("/Users/ctzolov/Dev/projects/credit-card-transaction-generator/src/main/resources/data/creditcard-normal.csv"));
+				new FileOutputStream("/Users/ctzolov/Dev/projects/credit-card-transaction-generator/src/main/resources/data/credit-card-normal.csv"));
 
 		reader.readLine(); //header
 

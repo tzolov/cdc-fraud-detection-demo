@@ -57,7 +57,7 @@ public abstract class FraudDetectionProcessorIntegrationTests {
 	public static class FraudDetectionPayloadTests extends FraudDetectionProcessorIntegrationTests {
 
 		@Test
-		public void testOne() {
+		public void testNormalTransaction() {
 
 			Object payloadNormal = ("{\"time\":403, \"v1\":1.13154130503628, \"v2\":-0.174361326933011, \"v3\":0.992621499569349, " +
 					"\"v4\":0.600032005318704, \"v5\":-1.02193420532219, \"v6\":-0.644778975272613, \"v7\":-0.428619436868548, " +
@@ -75,6 +75,10 @@ public abstract class FraudDetectionProcessorIntegrationTests {
 
 			Assert.assertNotNull(received);
 			Assert.assertEquals("{\"detection\":\"NORMAL\"}", received.getPayload());
+		}
+
+		@Test
+		public void testFraudTransaction() {
 
 			Object payloadFraud = ("{\"time\":406, \"v1\":-2.3122265423263, \"v2\":1.95199201064158, \"v3\":-1.60985073229769, " +
 					"\"v4\":3.9979055875468, \"v5\":-0.522187864667764, \"v6\":-1.42654531920595, \"v7\":-2.53738730624579, " +
@@ -87,11 +91,10 @@ public abstract class FraudDetectionProcessorIntegrationTests {
 
 			channels.input().send(MessageBuilder.withPayload(payloadFraud).build());
 
-			received = messageCollector.forChannel(channels.output()).poll();
+			Message<?> received = messageCollector.forChannel(channels.output()).poll();
 
 			Assert.assertNotNull(received);
 			Assert.assertEquals("{\"detection\":\"FRAUD\"}", received.getPayload());
-
 		}
 	}
 

@@ -1,14 +1,27 @@
 package org.spring.cloud.demo.credit.card.transaction.generator;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.io.IOUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Christian Tzolov
@@ -16,20 +29,46 @@ import org.springframework.util.Assert;
 @Component
 public class RecordGenerator {
 
+	public static String[] columns = new String[] { "Time", "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10",
+			"V11", "V12", "V13", "V14", "V15", "V16", "V17", "V18", "V19", "V20", "V21", "V22", "V23", "V24", "V25",
+			"V26", "V27", "V28", "Amount", "Class" };
+	private final List<String[]> normalRecords;
+	private final List<String[]> fraudRecords;
+
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
-	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	@Autowired
+	private RecordGeneratorProperties properties;
+
+	private ExecutorService executorService;
+
+	public RecordGenerator() {
+		this.executorService = Executors.newSingleThreadExecutor();
+		this.normalRecords = readCsv("classpath:/data/credit-card-normal.csv", true);
+		this.fraudRecords = readCsv("classpath:/data/credit-card-fraud.csv", true);
+	}
+
+	@PostConstruct
+	public void initDatabase() {
+		if (this.properties.isDropSchema()) {
+			String dropSchemaScript = getResourceAsString("classpath:/drop-schema.sql");
+			Assert.isTrue(!StringUtils.isEmpty(dropSchemaScript), "Failed to retrieve the drop-schema.sql");
+			this.jdbcTemplate.execute(dropSchemaScript);
+		}
+
+		// (re)create the DB schema if missing
+		String createSchemaScript = getResourceAsString("classpath:/create-schema.sql");
+		Assert.isTrue(!StringUtils.isEmpty(createSchemaScript), "Failed to retrieve the create-schema.sql");
+		this.jdbcTemplate.execute(createSchemaScript);
+	}
 
 	public void start(GeneratorControlView mainView) {
 
-		executorService.submit(() -> {
+		this.executorService.submit(() -> {
 			Assert.notNull(jdbcTemplate, "not null");
 
 			try {
-				List<String[]> normalRecords = CsvUtils.readCsv("classpath:/data/creditcard-normal.csv", true);
-				List<String[]> fraudRecords = CsvUtils.readCsv("classpath:/data/creditcard-fraud.csv", true);
-
 				Random random = new Random();
 				while (mainView.isStopped() == false) {
 					String[] record;
@@ -59,8 +98,31 @@ public class RecordGenerator {
 
 	}
 
+	private List<String[]> readCsv(String csvFilePath, boolean dropHeader) {
+		try {
+			Resource csvResource = new DefaultResourceLoader().getResource(csvFilePath);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(csvResource.getInputStream()));
+
+			if (dropHeader) {
+				reader.readLine(); //header
+			}
+
+			List<String[]> list = new ArrayList<>();
+
+			while (reader.ready()) {
+				String[] fieldStr = reader.readLine().split(",");
+				Arrays.copyOf(fieldStr, fieldStr.length - 1);
+				list.add(Arrays.copyOf(fieldStr, fieldStr.length - 1));
+			}
+			return list;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public void insertCreditCardTransaction(String... record) {
-		Assert.isTrue(record.length == CsvUtils.columns.length - 1,
+		Assert.isTrue(record.length == columns.length - 1,
 				"Incorrect number of columns in record: " + record.length);
 
 		jdbcTemplate.execute("INSERT INTO \"cdc\".\"credit_card_transaction\" (\"time\",\"v1\",\"v2\",\"v3\",\"v4\",\"v5\"," +
@@ -69,50 +131,12 @@ public class RecordGenerator {
 				"VALUES (" + String.join(",", record) + ")");
 	}
 
-	public void createCreditCardTransactionDatabase(boolean recreateTable) {
-		this.jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS \"cdc\"");
-		this.jdbcTemplate.execute("SET search_path TO \"cdc\"");
-
-		if (recreateTable) {
-			try {
-				this.jdbcTemplate.execute("DROP TABLE IF EXISTS \"cdc\".\"credit_card_transaction\"");
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+	private String getResourceAsString(String uri) {
+		try {
+			return IOUtils.toString(new DefaultResourceLoader().getResource(uri).getInputStream(), Charset.forName("UTF8"));
 		}
-
-		this.jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS \"cdc\".\"credit_card_transaction\" (" +
-				"    \"time\"   FLOAT," +
-				"    \"v1\"     FLOAT," +
-				"    \"v2\"     FLOAT," +
-				"    \"v3\"     FLOAT," +
-				"    \"v4\"     FLOAT," +
-				"    \"v5\"     FLOAT," +
-				"    \"v6\"     FLOAT," +
-				"    \"v7\"     FLOAT," +
-				"    \"v8\"     FLOAT," +
-				"    \"v9\"     FLOAT," +
-				"    \"v10\"    FLOAT," +
-				"    \"v11\"    FLOAT," +
-				"    \"v12\"    FLOAT," +
-				"    \"v13\"    FLOAT," +
-				"    \"v14\"    FLOAT," +
-				"    \"v15\"    FLOAT," +
-				"    \"v16\"    FLOAT," +
-				"    \"v17\"    FLOAT," +
-				"    \"v18\"    FLOAT," +
-				"    \"v19\"    FLOAT," +
-				"    \"v20\"    FLOAT," +
-				"    \"v21\"    FLOAT," +
-				"    \"v22\"    FLOAT," +
-				"    \"v23\"    FLOAT," +
-				"    \"v24\"    FLOAT," +
-				"    \"v25\"    FLOAT," +
-				"    \"v26\"    FLOAT," +
-				"    \"v27\"    FLOAT," +
-				"    \"v28\"    FLOAT," +
-				"    \"amount\" FLOAT " +
-				")");
+		catch (IOException e) {
+			throw new RuntimeException("Failed to retrieve resource from URI:" + uri, e);
+		}
 	}
 }

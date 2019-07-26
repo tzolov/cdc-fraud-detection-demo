@@ -51,8 +51,6 @@ import org.springframework.util.Assert;
 @Import(TensorflowCommonProcessorConfiguration.class)
 public class FraudDetectionProcessorConfiguration {
 
-	public final static String PROCESSOR_CONTEXT_INPUT_RECORD = "PROCESSOR_CONTEXT_INPUT_RECORD";
-
 	private static final Log logger = LogFactory.getLog(FraudDetectionProcessorConfiguration.class);
 
 	@Autowired
@@ -68,7 +66,11 @@ public class FraudDetectionProcessorConfiguration {
 
 	@Bean
 	public TensorflowOutputConverter tensorflowOutputConverter() {
-		return new FraudOutputConverter();
+		Assert.notNull(this.commonProcessorProperties.getModelFetch(), "Fetch outputs are null");
+		Assert.isTrue(this.commonProcessorProperties.getModelFetch().size() == 1,
+				"A single fetch output is expected but found:" + this.commonProcessorProperties.getModelFetch());
+
+		return new FraudOutputConverter(this.commonProcessorProperties.getModelFetch().get(0));
 	}
 
 	@Bean
@@ -77,14 +79,19 @@ public class FraudDetectionProcessorConfiguration {
 	}
 
 	public static class FraudOutputConverter implements TensorflowOutputConverter<String> {
+		private String fetchOutput;
+
+		public FraudOutputConverter(String fetchOutput) {
+			this.fetchOutput = fetchOutput;
+		}
+
 		@Override
 		public String convert(Map<String, Tensor<?>> resultTensors, Map<String, Object> processorContext) {
 
-			float[][] val = resultTensors.get("output").copyTo(new float[1][2]);
+			float[][] val = resultTensors.get(fetchOutput).copyTo(new float[1][2]);
 
 			String result = (val[0][1] < 0.999 && val[0][0] >= 0.999) ? "FRAUD" : "NORMAL";
 			Map<String, Object> outputJsonMap = new HashMap<>();
-			//outputJsonMap.put("input", processorContext.get(PROCESSOR_CONTEXT_INPUT_RECORD));
 			outputJsonMap.put("detection", result);
 
 			try {
