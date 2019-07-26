@@ -4,10 +4,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.springframework.cloud.stream.app</groupId>
-	<artifactId>fraud-app-dependencies</artifactId>
+	<artifactId>fraud-detection-app-dependencies</artifactId>
 	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>fraud-app-dependencies</name>
+	<name>fraud-detection-app-dependencies</name>
 	<description>Spring Cloud Stream fraud App Dependencies</description>
 
 	<parent>
