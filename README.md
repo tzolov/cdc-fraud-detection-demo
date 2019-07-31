@@ -61,11 +61,33 @@ springcloud/spring-cloud-skipper-server:2.1.0.BS                  0.0.0.0:7577->
 
 ![](./images/dashboard-import-1.png)
 
-* Use the `Upload Json File` button and select the ``/cdc-fraud-detection-demo/grafana/CreditCardFraudAnalysis.json` from the git cloned project.
+* Use the `Upload Json File` button and select the `/cdc-fraud-detection-demo/grafana/CreditCardFraudAnalysis.json` from the git cloned project.
 
 * Select ScdfPrometheus as data source and press ‘Import’:
 
 ![](./images/dashboard-import-2.png)
 
 This will import a new ‘Credit Card Fraud Analysis’ dashboard and make it accessible via the main menu.
+
+### Deploy Spring Cloud Streams
+
+* Open the SCDF Web dashboard at http://localhost:9393/dashboard/#/streams/definitions and navigate to the  Stream definitions.
+
+* Press ‘Create New Stream’ button and add the following streams:
+
+```
+fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | counter --name=credit --counter.tag.expression.fraud=#jsonPath(payload,'$..detection')
+
+fraud-log=:fraud-detection.fraud-detection > log
+```
+
+You should see a diagram like this: 
+
+![](./images/scdf-cdc-fraud-pipeline.png)
+
+* Press `Create Stream` button.
+
+* Deploy both (fraud-detection and fraud-log) stream. Wait until all apps are deployed
+
+![](./images/runtime-applications.png)
 
