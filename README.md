@@ -9,22 +9,22 @@ Realtime Credit Card fraud detection, using CDC (Change Data Capture) data sourc
 
 Prerequisite: At least 6-7GB needs to be provided to your Docker daemon! 
 
-#### Docker compose installation
+### Docker compose installation
 
-Checkout the https://github.com/tzolov/cdc-fraud-detection-demo project and change the local directory to `docker``:
+* Checkout the https://github.com/tzolov/cdc-fraud-detection-demo project and change the local directory to `docker``:
 
 ```
 git clone git@github.com:tzolov/cdc-fraud-detection-demo.git
 cd cdc-fraud-detection-demo/docker
 ```
 
-Download the Spring Cloud Data Flow Server Docker Compose file:
+* Download the Spring Cloud Data Flow Server Docker Compose file:
 
 ```
 wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/v2.2.0.RC1/spring-cloud-dataflow-server/docker-compose.yml
 ```
 
-Make sure that both the `docker-compose.yml` and the `docker-compose.fraud.yml` files are present in the local directory and then  start the docker-compose:
+* Make sure that both the `docker-compose.yml` and the `docker-compose.fraud.yml` files are present in the local directory and then  start the docker-compose:
 
 ```
 export DATAFLOW_VERSION=2.2.0.BUILD-SNAPSHOT
@@ -32,7 +32,7 @@ export SKIPPER_VERSION=2.1.0.BUILD-SNAPSHOT
 docker-compose -f ./docker-compose.yml -f ./docker-compose.fraud up
 ```
 
-It may take two, three minutes for all containers and services to start. Once ready you should see the following running containers:
+* It may take two, three minutes for all containers and services to start. Once ready you should see the following running containers:
 
 ```
 docker ps -a
@@ -53,7 +53,7 @@ springcloud/spring-cloud-skipper-server:2.1.0.BS                  0.0.0.0:7577->
                                                                   0.0.0.0:20000-20105->20000-20105/tcp skipper
 ```
 
-#### Import Grafana Dashboard
+### Import Grafana Dashboard
 
 * Open `Grafana UI` at http://localhost:3000 using the username: `admin` and password: `admin`. Skip the request to change the password. 
 
