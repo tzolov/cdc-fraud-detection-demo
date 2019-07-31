@@ -2,7 +2,7 @@
 Realtime Credit Card fraud detection, using CDC (Change Data Capture) data source and TensorFlow model from a Kaggle competition.
 
 
-![](./images/Real-Time Credit Card Fraud Detection.png)
+![Demo Architecture](./images/real-time-credit-card-fraud-detection.png)
 
 ## Docker Compose Demo
 
