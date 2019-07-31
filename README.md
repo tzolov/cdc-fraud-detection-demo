@@ -55,14 +55,16 @@ springcloud/spring-cloud-skipper-server:2.1.0.BS                  0.0.0.0:7577->
 
 #### Import Grafana Dashboard
 
-Open `Grafana UI` at http://localhost:3000 using the username: `admin` and password: `admin`. Skip the request to change the password. 
+* Open `Grafana UI` at http://localhost:3000 using the username: `admin` and password: `admin`. Skip the request to change the password. 
 
-From the main menu select `+` and `Import`:
+* From the main menu select `+` and `Import`:
+
 ![](./images/dashboard-import-1.png)
 
-Use the `Upload Json File` button and select the ``/cdc-fraud-detection-demo/grafana/CreditCardFraudAnalysis.json` from the git cloned project.
+* Use the `Upload Json File` button and select the ``/cdc-fraud-detection-demo/grafana/CreditCardFraudAnalysis.json` from the git cloned project.
 
-Select ScdfPrometheus as data source and press ‘Import’:
+* Select ScdfPrometheus as data source and press ‘Import’:
+
 ![](./images/dashboard-import-2.png)
 
 This will import a new ‘Credit Card Fraud Analysis’ dashboard and make it accessible via the main menu.
