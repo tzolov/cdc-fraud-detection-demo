@@ -91,3 +91,16 @@ You should see a diagram like this:
 
 ![](./images/runtime-applications.png)
 
+### Transaction Generator and Fraud Monitoring
+
+* Open the Credit Card Transaction Generator at http://localhost:8384/generator , 
+
+* Configure the desired transaction rate and fraud ration and press the Start button.
+
+![](./credit-card-transaction-generator/src/main/resources/static/creadit-card-transaction-generator-ui.png)
+
+* Open the Grafana Fraud dashboard in another window tab and wait for about 1 min for the first metrics to be recorded.
+
+* You can continually change the card transaction rate and fraud ration and should observe the effect in the dashboard
+
+![](./images/fraud-grafana-dashboard.png)
