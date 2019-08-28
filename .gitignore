@@ -26,4 +26,5 @@ coverage-error.log
 .apt_generated
 aws.credentials.properties
 docker/docker-compose.yml
+docker/docker-compose-prometheus.yml
 

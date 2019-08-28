@@ -18,18 +18,22 @@ git clone git@github.com:tzolov/cdc-fraud-detection-demo.git
 cd cdc-fraud-detection-demo/docker
 ```
 
-* Download the Spring Cloud Data Flow Server Docker Compose file:
+* Download the Spring Cloud Data Flow Server `docker-compose` and `docker-compose-prometheus` installation files:
 
 ```
-wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/v2.2.0.RC1/spring-cloud-dataflow-server/docker-compose.yml
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/master/spring-cloud-dataflow-server/docker-compose.yml
+```
+```
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/master/spring-cloud-dataflow-server/docker-compose-prometheus.yml
 ```
 
-* Make sure that both the `docker-compose.yml` and the `docker-compose.fraud.yml` files are present in the local directory and then  start the docker-compose:
+* Make sure that all the `docker-compose.yml`, `docker-compose-prometheus.yml` and the `docker-compose.fraud.yml` files are present in the local directory and then start run:
 
 ```
-export DATAFLOW_VERSION=2.2.0.BUILD-SNAPSHOT
-export SKIPPER_VERSION=2.1.0.BUILD-SNAPSHOT
-docker-compose -f ./docker-compose.yml -f ./docker-compose.fraud up
+export DATAFLOW_VERSION=2.3.0.BUILD-SNAPSHOT
+export SKIPPER_VERSION=2.2.0.BUILD-SNAPSHOT
+export STREAM_APPS_URI='https://dataflow.spring.io/Einstein-BUILD-SNAPSHOT-stream-applications-kafka-maven&force=true'
+docker-compose -f ./docker-compose.yml -f ./docker-compose-prometheus.yml -f ./docker-compose.fraud.yml up
 ```
 
 * It may take two, three minutes for all containers and services to start. Once ready you should see the following running containers:
