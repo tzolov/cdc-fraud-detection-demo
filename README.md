@@ -108,3 +108,19 @@ You should see a diagram like this:
 * You can continually change the card transaction rate and fraud ration and should observe the effect in the dashboard
 
 ![](./images/fraud-grafana-dashboard.png)
+
+## Kubernetes Demo
+
+kubectl create -f kubernetes/postgres-cdc/
+kubectl create -f kubernetes/generator/
+
+Apps Uri: https://dataflow.spring.io/Einstein-BUILD-SNAPSHOT-stream-applications-kafka-docker
+
+docker://springcloudstream/cdc-debezium-source-kafka:latest
+maven://org.springframework.cloud.stream.app:cdc-debezium-source-kafka:jar:metadata:1.0.0.BUILD-SNAPSHOT
+
+docker://tzolov/fraud-detection-processor-kafka:latest
+https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.1-metadata.jar
+
+--
+docker://tzolov/task-demo-metrics:latest

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: generator
+  labels:
+    app: generator
+spec:
+  selector:
+    matchLabels:
+      app: generator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: generator
+    spec:
+      containers:
+      - image: tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT
+        name: generator
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8384
+        resources:
+          limits:
+            cpu: 1.0
+            memory: 2048Mi
+          requests:
+            cpu: 0.5
+            memory: 1024Mi
+        env:
+        - name: SERVER_PORT
+          value: '8384'
+        - name: SPRING_DATASOURCE_URL
+          value: 'jdbc:postgresql://postgres-cdc:5432/postgres'
+        - name: SPRING_DATASOURCE_USERNAME
+          value: postgres
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: postgres
+        - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+          value: 'org.postgresql.Driver'

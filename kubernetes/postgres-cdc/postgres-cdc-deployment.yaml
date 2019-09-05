@@ -1,0 +1,30 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: postgres-cdc
+  labels:
+    app: postgres-cdc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres-cdc
+    spec:
+      containers:
+      - image: debezium/example-postgres:0.10
+        name: postgres-cdc
+        env:
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: postgres
+        ports:
+          - containerPort: 5432
+            name: postgres
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: data
+        emptyDir: {}

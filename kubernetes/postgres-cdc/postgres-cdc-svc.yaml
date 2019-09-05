@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-cdc
+  labels:
+    app: postgres-cdc
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres-cdc
