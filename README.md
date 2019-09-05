@@ -111,16 +111,54 @@ You should see a diagram like this:
 
 ## Kubernetes Demo
 
+Follow the [SCDF Kubernetes Installation](https://dataflow.spring.io/docs/installation/kubernetes/kubectl/) instructions to install SCDF, Skipper and the remaining components including `Prometheus` and `Grafana`
+
+As a shortcut run the following commands from the `spring-cloud-dataflow` directory: 
+```bash
+kubectl create -f src/kubernetes/kafka/
+kubectl create -f src/kubernetes/mysql/
+
+kubectl create -f src/kubernetes/prometheus-proxy/
+
+kubectl create -f src/kubernetes/prometheus/prometheus-clusterroles.yaml
+kubectl create -f src/kubernetes/prometheus/prometheus-clusterrolebinding.yaml
+kubectl create -f src/kubernetes/prometheus/prometheus-serviceaccount.yaml
+kubectl create -f src/kubernetes/prometheus/prometheus-configmap.yaml
+kubectl create -f src/kubernetes/prometheus/prometheus-deployment.yaml
+kubectl create -f src/kubernetes/prometheus/prometheus-service.yaml
+
+kubectl create -f src/kubernetes/grafana/
+
+kubectl create -f src/kubernetes/server/server-roles.yaml
+kubectl create -f src/kubernetes/server/server-rolebinding.yaml
+kubectl create -f src/kubernetes/server/service-account.yaml
+
+kubectl create -f src/kubernetes/skipper/skipper-config-kafka.yaml
+kubectl create -f src/kubernetes/skipper/skipper-deployment.yaml
+kubectl create -f src/kubernetes/skipper/skipper-svc.yaml
+
+kubectl create -f src/kubernetes/server/server-config.yaml
+kubectl create -f src/kubernetes/server/server-svc.yaml
+kubectl create -f src/kubernetes/server/server-deployment.yaml
+```
+This will deploy SCDF, Skipper with MySQL and Kafka. Also Prometheus, Prometheus-Rsocket and Grafana are installed 
+
+For the CDC Fraud demo add the following additional commands: 
+```bash
 kubectl create -f kubernetes/postgres-cdc/
 kubectl create -f kubernetes/generator/
+```
+Later deploys the `Transaction Generator` and `PostgreSQL-CDC` in k8s. 
 
-Apps Uri: https://dataflow.spring.io/Einstein-BUILD-SNAPSHOT-stream-applications-kafka-docker
+From the SCDF UI Apps register the following apps:
 
-docker://springcloudstream/cdc-debezium-source-kafka:latest
-maven://org.springframework.cloud.stream.app:cdc-debezium-source-kafka:jar:metadata:1.0.0.BUILD-SNAPSHOT
+* Bulk import of https://dataflow.spring.io/Einstein-BUILD-SNAPSHOT-stream-applications-kafka-docker
+* name: `cdc-debezium`, type: `Source`, uri: `docker://springcloudstream/cdc-debezium-source-kafka:latest`, metadata-uri: `maven://org.springframework.cloud.stream.app:cdc-debezium-source-kafka:jar:metadata:1.0.0.BUILD-SNAPSHOT`
+* name: `fraud-detection`, type: `Processor`, uri: `docker://tzolov/fraud-detection-processor-kafka:latest`, metadata-uri: `https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.1-metadata.jar`
 
-docker://tzolov/fraud-detection-processor-kafka:latest
-https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.1-metadata.jar
+The follow the [Import Grafana Dashboard][], [Deploy Spring Cloud Streams][] and [Transaction Generator and Fraud Monitoring][] instructions above.
 
---
-docker://tzolov/task-demo-metrics:latest
+
+
+---
+Test task metrics: docker://tzolov/task-demo-metrics:latest
