@@ -156,7 +156,7 @@ From the SCDF UI Apps register the following apps:
 * name: `cdc-debezium`, type: `Source`, uri: `docker://springcloudstream/cdc-debezium-source-kafka:latest`, metadata-uri: `maven://org.springframework.cloud.stream.app:cdc-debezium-source-kafka:jar:metadata:1.0.0.BUILD-SNAPSHOT`
 * name: `fraud-detection`, type: `Processor`, uri: `docker://tzolov/fraud-detection-processor-kafka:latest`, metadata-uri: `https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.1-metadata.jar`
 
-The follow the [Import Grafana Dashboard](https://github.com/tzolov/cdc-fraud-detection-demo#import-grafana-dashboard), [Deploy Spring Cloud Streams](https://github.com/tzolov/cdc-fraud-detection-demo#deploy-spring-cloud-streams) and [Transaction Generator and Fraud Monitoring](https://github.com/tzolov/cdc-fraud-detection-demo#transaction-generator-and-fraud-monitoring) instructions above.
+Then follow the [Import Grafana Dashboard](https://github.com/tzolov/cdc-fraud-detection-demo#import-grafana-dashboard), [Deploy Spring Cloud Streams](https://github.com/tzolov/cdc-fraud-detection-demo#deploy-spring-cloud-streams) and [Transaction Generator and Fraud Monitoring](https://github.com/tzolov/cdc-fraud-detection-demo#transaction-generator-and-fraud-monitoring) instructions above.
 
 
 ---
