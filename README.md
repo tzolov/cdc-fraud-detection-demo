@@ -80,7 +80,7 @@ This will import a new ‘Credit Card Fraud Analysis’ dashboard and make it ac
 * Press ‘Create New Stream’ button and add the following streams:
 
 ```
-fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | counter --name=credit --counter.tag.expression.fraud=#jsonPath(payload,'$..detection')
+fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | counter --counter.name=credit --counter.tag.expression.fraud=#jsonPath(payload,'$..detection')
 
 fraud-log=:fraud-detection.fraud-detection > log
 ```
@@ -158,6 +158,9 @@ From the SCDF UI Apps register the following apps:
 
 Then follow the [Import Grafana Dashboard](https://github.com/tzolov/cdc-fraud-detection-demo#import-grafana-dashboard), [Deploy Spring Cloud Streams](https://github.com/tzolov/cdc-fraud-detection-demo#deploy-spring-cloud-streams) and [Transaction Generator and Fraud Monitoring](https://github.com/tzolov/cdc-fraud-detection-demo#transaction-generator-and-fraud-monitoring) instructions above.
 
-
+```
+kubectl delete all,cm,svc -l app=generator
+kubectl delete all,cm,svc -l app=postgres-cdc
+```
 ---
 Test task metrics: docker://tzolov/task-demo-metrics:latest
