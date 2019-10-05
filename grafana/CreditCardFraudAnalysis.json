@@ -20,7 +20,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "6.3.5"
+      "version": "6.3.3"
     },
     {
       "type": "panel",
@@ -87,6 +87,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
+      "datasource": "${DS_SCDFPROMETHEUS}",
       "description": "Total number of Normal transactions",
       "format": "none",
       "gauge": {
@@ -222,6 +223,7 @@
         "mode": "spectrum"
       },
       "dataFormat": "timeseries",
+      "datasource": "${DS_SCDFPROMETHEUS}",
       "gridPos": {
         "h": 8,
         "w": 16,
@@ -291,6 +293,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#e24d42"
       ],
+      "datasource": "${DS_SCDFPROMETHEUS}",
       "description": "Total number of Fraud transactions",
       "format": "none",
       "gauge": {
@@ -574,5 +577,5 @@
   "timezone": "",
   "title": "Credit Card Fraud Analysis",
   "uid": "FkRxlYHZz",
-  "version": 3
+  "version": 2
 }
