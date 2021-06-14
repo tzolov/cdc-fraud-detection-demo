@@ -13,7 +13,7 @@ services:
       - 5432
 
   transaction-generator:
-    image: tzolov/credit-card-transaction-generator:1.0.1-SNAPSHOT
+    image: tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT
     container_name: transaction-generator
     ports:
       - "8384:8384"
