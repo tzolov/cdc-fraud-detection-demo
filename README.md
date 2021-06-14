@@ -18,22 +18,26 @@ git clone git@github.com:tzolov/cdc-fraud-detection-demo.git
 cd cdc-fraud-detection-demo/docker
 ```
 
-* Download the Spring Cloud Data Flow Server `docker-compose` and `docker-compose-prometheus` installation files:
+* Download the Spring Cloud Data Flow Server `docker-compose`, `docker-compose-prometheus` and `docker-compose-dood` installation files:
 
 ```
-wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/master/spring-cloud-dataflow-server/docker-compose.yml
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose/docker-compose.yml
 ```
 ```
-wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/master/spring-cloud-dataflow-server/docker-compose-prometheus.yml
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose/docker-compose-dood.yml
 ```
 
-* Make sure that all the `docker-compose.yml`, `docker-compose-prometheus.yml` and the `docker-compose.fraud.yml` files are present in the local directory and then start run:
+```
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose/docker-compose-prometheus.yml
+```
+
+* Make sure that all the `docker-compose.yml`, `docker-compose-prometheus.yml`, `docker-compose-dood.yml` and the `docker-compose.fraud.yml` files are present in the local directory and then start run:
 
 ```
-export DATAFLOW_VERSION=2.3.0.BUILD-SNAPSHOT
-export SKIPPER_VERSION=2.2.0.BUILD-SNAPSHOT
-export STREAM_APPS_URI='https://dataflow.spring.io/Einstein-BUILD-SNAPSHOT-stream-applications-kafka-maven&force=true'
-docker-compose -f ./docker-compose.yml -f ./docker-compose-prometheus.yml -f ./docker-compose.fraud.yml up
+export COMPOSE_HTTP_TIMEOUT=300
+export COMPOSE_PROJECT_NAME=scdf
+
+docker-compose -f ./docker-compose.yml -f ./docker-compose-prometheus.yml -f ./docker-compose.fraud.yml -f ./docker-compose-dood.yml up
 ```
 
 * It may take two, three minutes for all containers and services to start. Once ready you should see the following running containers:
@@ -80,7 +84,7 @@ This will import a new ‘Credit Card Fraud Analysis’ dashboard and make it ac
 * Press ‘Create New Stream’ button and add the following streams:
 
 ```
-fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | counter --counter.name=credit --counter.tag.expression.fraud=#jsonPath(payload,'$..detection')
+fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | analytics --analytics.name=credit --analytics.tag.expression.fraud=#jsonPath(payload,'$..detection')
 
 fraud-log=:fraud-detection.fraud-detection > log
 ```
@@ -152,9 +156,7 @@ Later deploys the `Transaction Generator` and `PostgreSQL-CDC` in k8s.
 
 From the SCDF UI Apps register the following apps:
 
-* Bulk import of https://dataflow.spring.io/Einstein-BUILD-SNAPSHOT-stream-applications-kafka-docker
-* name: `cdc-debezium`, type: `Source`, uri: `docker://springcloudstream/cdc-debezium-source-kafka:latest`, metadata-uri: `maven://org.springframework.cloud.stream.app:cdc-debezium-source-kafka:jar:metadata:1.0.0.BUILD-SNAPSHOT`
-* name: `fraud-detection`, type: `Processor`, uri: `docker://tzolov/fraud-detection-processor-kafka:latest`, metadata-uri: `https://dl.bintray.com/big-data/maven/fraud-detection-processor-kafka-1.0.1-metadata.jar`
+* name: `fraud-detection`, type: `Processor`, uri: `docker://tzolov/fraud-detection-processor-kafka:latest`.
 
 Then follow the [Import Grafana Dashboard](https://github.com/tzolov/cdc-fraud-detection-demo#import-grafana-dashboard), [Deploy Spring Cloud Streams](https://github.com/tzolov/cdc-fraud-detection-demo#deploy-spring-cloud-streams) and [Transaction Generator and Fraud Monitoring](https://github.com/tzolov/cdc-fraud-detection-demo#transaction-generator-and-fraud-monitoring) instructions above.
 

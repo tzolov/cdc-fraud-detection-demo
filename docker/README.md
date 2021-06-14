@@ -2,19 +2,19 @@
 To download the Spring Cloud Data Flow Server Docker Compose file, run the following command:
 
 ```
-wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/v2.2.0.RC1/spring-cloud-dataflow-server/docker-compose.yml
-
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose/docker-compose.yml
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose/docker-compose-dood.yml
+wget https://raw.githubusercontent.com/spring-cloud/spring-cloud-dataflow/main/src/docker-compose/docker-compose-prometheus.yml
+wget https://raw.githubusercontent.com/tzolov/cdc-fraud-detection-demo/master/docker/docker-compose.fraud.yml
 ```
 
-In the directory where you downloaded `docker-compose.yml` and `docker-compose.fraud.yml` was already present, start the system, by running the following commands:
-```
-export DATAFLOW_VERSION=2.2.0.BUILD-SNAPSHOT
-export SKIPPER_VERSION=2.1.0.BUILD-SNAPSHOT
-docker-compose -f ./docker-compose.yml -f ./docker-compose.fraud up
-```
+From within the directory where you downloaded the above four docker-compose files, start the system, by running the following commands:
 
 ```
-stream3=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | log
+export COMPOSE_HTTP_TIMEOUT=300
+export COMPOSE_PROJECT_NAME=scdf
+
+docker-compose -f ./docker-compose.yml -f ./docker-compose-prometheus.yml -f ./docker-compose.fraud.yml -f ./docker-compose-dood.yml up
 ```
 
 ```
@@ -26,5 +26,5 @@ stream2=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connect
 ```
 
 ```
-stream4=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | counter --name=credit --counter.tag.expression.fraud=#jsonPath(payload,'$..detection')
+stream4=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | analytics --analytics.name=credit --analytics.tag.expression.fraud=#jsonPath(payload,'$..detection')
 ```
