@@ -50,7 +50,7 @@ springcloud/spring-cloud-dataflow-prometheus-local:2.2.0.BS       0.0.0.0:9090->
 springcloud/spring-cloud-dataflow-prometheus-service-discovery:0.0.4.RELEASE 
                                                                   0.0.0.0:8181->8181/tcp       service-discovery
 springcloud/spring-cloud-dataflow-server:2.2.0.BS                 0.0.0.0:9393->9393/tcp       dataflow-server
-tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT           0.0.0.0:8384->8384/tcp       transaction-generator
+tzolov/credit-card-transaction-generator:1.0.1-SNAPSHOT           0.0.0.0:8384->8384/tcp       transaction-generator
  confluentinc/cp-kafka:5.2.1                                      9092/tcp                     dataflow-kafka
 debezium/example-postgres:0.10                                    0.0.0.0:5432->5432/tcp       postgres-cdc
 mysql:5.7.25                                                      3306/tcp, 33060/tcp          dataflow-mysql

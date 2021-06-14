@@ -31,3 +31,15 @@ build/
 .vscode/
 
 .DS_Store
+
+### Vaadin generated ###
+frontend
+node_modules
+.npmrc
+package.json
+pnpm-lock.yaml
+pnpmfile.js
+tsconfig.json
+types.d.ts
+webpack.config.js
+webpack.generated.js

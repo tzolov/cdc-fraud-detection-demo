@@ -15,7 +15,7 @@ spec:
         app: generator
     spec:
       containers:
-      - image: tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT
+      - image: tzolov/credit-card-transaction-generator:1.0.1-SNAPSHOT
         name: generator
         imagePullPolicy: Always
         ports:

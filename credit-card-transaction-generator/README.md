@@ -1,6 +1,6 @@
 ## Credit Card Transaction Data Generator
 
-Standalone application that can continuously generate data records compliant with the the data format specified in [Credit Card Fraud Detection](https://www.kaggle.com/mlg-ulb/creditcardfraud) - Anonymized credit card transactions labeled as fraudulent or genuine.
+Standalone application that can continuously generate data records compliant with the data format specified in [Credit Card Fraud Detection](https://www.kaggle.com/mlg-ulb/creditcardfraud) - Anonymized credit card transactions labeled as fraudulent or genuine.
 
 The data records are generated in random intervals and pushed into a pre-configured Database.  
 
@@ -66,7 +66,7 @@ spring.datasource.username=postgres
 spring.datasource.password=postgres
 ```
 
-By default the generator runs at http://localhost:8080/generator . 
+By default, the generator runs at http://localhost:8080/generator . 
 Use the `server.port` property to alter the default port.
 
 The `credit.card.transaction.generator.drop-schema` property (`true` by default) disables the automatic schema re-creation on start.
@@ -94,25 +94,37 @@ By default the control panel is accessible at http://localhost:8080/generator an
 
 Build jar and docker image:
 ```
-./mvnw clean install docker:build
+./mvnw clean install spring-boot:build-image
 ```
-produces and boot `credit-card-transaction-generator-0.0.1-SNAPSHOT.jar` and a docker images `tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT`
+produces and boot `credit-card-transaction-generator-1.0.1-SNAPSHOT.jar` and a docker images `credit-card-transaction-generator:1.0.1-SNAPSHOT`
 
 Publish docker image to DockerHub:
-```
-./mvnw  docker:push
+```bash
+docker image tag credit-card-transaction-generator:1.0.1-SNAPSHOT tzolov/credit-card-transaction-generator:1.0.1-SNAPSHOT
+docker push
 ```
 
 Run the jar locally (first start the posgress database as explained in the next section):
 
+```bash
+java -jar ./target/credit-card-transaction-generator-1.0.1-SNAPSHOT.jar --spring.datasource.driver-class-name=org.postgresql.Driver --spring.datasource.url=jdbc:postgresql://localhost:5432/postgres --spring.datasource.username=postgres --spring.datasource.password=postgres
 ```
-java -jar ./target/credit-card-transaction-generator-0.0.1-SNAPSHOT.jar --spring.datasource.driver-class-name=org.postgresql.Driver --spring.datasource.url=jdbc:postgresql://localhost:5432/postgres --spring.datasource.username=postgres --spring.datasource.password=postgres
+
+Or run the docker image locally (first start the posgress database as explained in the next section):
+
+```bash
+docker run -it --rm --name transaction-generator -p 8080:8080 -e SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/postgres -e SPRING_DATASOURCE_USERNAME=postgres -e SPRING_DATASOURCE_PASSWORD=postgres tzolov/credit-card-transaction-generator:1.0.1-SNAPSHOT
 ```
+
+> NOTE: The [host.docker.internal](https://docs.docker.com/docker-for-mac/networking/#use-cases-and-workarounds) is a special Docker placeholder, that should resolve into your `HOST IP` address. If it doesn't work, then replace it with your HOST IP directly!
+
+Then open the Generator pages at http://localhost:8080/generator
+
 #### Testing
 
 Start local Postgres:
 ```bash
-docker run -it --rm --name postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres debezium/example-postgres:0.10
+docker run -it --rm --name postgres -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres debezium/example-postgres:1.3
 ```
 
 You can connect to the postgres server using password: `postgres`:
