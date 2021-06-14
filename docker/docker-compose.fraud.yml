@@ -13,7 +13,7 @@ services:
       - 5432
 
   transaction-generator:
-    image: tzolov/credit-card-transaction-generator:0.0.1-SNAPSHOT
+    image: tzolov/credit-card-transaction-generator:1.0.1-SNAPSHOT
     container_name: transaction-generator
     ports:
       - "8384:8384"
@@ -27,7 +27,6 @@ services:
       - server.port=8384
     depends_on:
       - postgres-cdc
-    entrypoint: "./wait-for-it.sh -t 180 postgres-cdc:5432 -- java -jar /maven/credit-card-transaction-generator.jar"
 
   dataflow-cdc-app-import:
     image: springcloud/openjdk:2.0.0.RELEASE
@@ -37,8 +36,5 @@ services:
     command: >
       /bin/sh -c "
         ./wait-for-it.sh -t 180 dataflow-server:9393;
-        wget -qO- 'http://dataflow-server:9393/apps/processor/fraud-detection' --post-data='uri=docker:tzolov/fraud-detection-processor-kafka:latest&force=true';
+        wget -qO- 'http://dataflow-server:9393/apps/processor/fraud-detection/latest' --post-data='uri=docker:tzolov/fraud-detection-processor-kafka:latest&force=true';
         echo 'CDC and Fraud apps imported'"
-
-#        wget -qO- 'http://dataflow-server:9393/apps/processor/fraud-detection/1.0.1.BUILD-SNAPSHOT' --post-data='uri=maven://org.springframework.cloud.stream.app:fraud-detection-processor-kafka:1.0.1.BUILD-SNAPSHOT&metadata-uri=maven://org.springframework.cloud.stream.app:fraud-detection-processor-kafka:jar:metadata:1.0.1.BUILD-SNAPSHOT&force=true';
-
