@@ -84,7 +84,7 @@ This will import a new ‘Credit Card Fraud Analysis’ dashboard and make it ac
 * Press ‘Create New Stream’ button and add the following streams:
 
 ```
-fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --model-fetch=output --model='classpath:/fraud_detection_graph.pb' | analytics --analytics.name=credit --analytics.tag.expression.fraud=#jsonPath(payload,'$..detection')
+fraud-detection=cdc-debezium --cdc.config.schema.whitelist=cdc --cdc.name=my-sql-connector --cdc.connector=postgres --cdc.config.database.user=postgres --cdc.config.database.password=postgres --cdc.config.database.dbname=postgres --cdc.config.database.hostname=postgres-cdc --cdc.config.database.port=5432 --cdc.config.database.server.name=my-app-connector --cdc.flattering.enabled=true | fraud-detection --fraud.detection.processor.model='classpath:/fraud_detection_graph.pb' | analytics --analytics.name=credit --analytics.tag.expression.fraud=#jsonPath(payload,'$..detection')
 
 fraud-log=:fraud-detection.fraud-detection > log
 ```

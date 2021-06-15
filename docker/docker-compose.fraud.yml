@@ -36,5 +36,5 @@ services:
     command: >
       /bin/sh -c "
         ./wait-for-it.sh -t 180 dataflow-server:9393;
-        wget -qO- 'http://dataflow-server:9393/apps/processor/fraud-detection/latest' --post-data='uri=docker:tzolov/fraud-detection-processor-kafka:latest&force=true';
+        wget -qO- 'http://dataflow-server:9393/apps/processor/fraud-detection/3.0.0-SNAPSHOT' --post-data='uri=docker:tzolov/fraud-detection-processor-kafka:3.0.0-SNAPSHOT&force=true';
         echo 'CDC and Fraud apps imported'"
