@@ -16,10 +16,6 @@
 
 package org.springframework.cloud.stream.app.processor.fraud.detection;
 
-/**
- * @author Christian Tzolov
- */
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -62,23 +58,21 @@ public class FraudDetectionProcessorConfiguration {
 			Function<byte[], Map<String, Tensor<?>>> payloadToTensorMap,
 			Function<Map<String, Tensor<?>>, String> fromTensorMap) {
 
-		return input -> {
-			byte[] payload = input.getPayload();
+		final GraphRunner graphRunner = new GraphRunner(Arrays.asList("pkeep", "input"), "output")
+				.withGraphDefinition(new ProtoBufGraphDefinition(properties.getModel(), properties.isModelCached()));
 
-			GraphRunner graphRunner = new GraphRunner(Arrays.asList("pkeep", "input"), "output")
-					.withGraphDefinition(new ProtoBufGraphDefinition(properties.getTensorflow().getModelUri(), true));
+		return inputMessage -> {
+
+			byte[] payload = inputMessage.getPayload();
 
 			String result = payloadToTensorMap
 					.andThen(graphRunner)
 					.andThen(fromTensorMap)
 					.apply(payload);
 
-			Message<byte[]> outMessage = MessageBuilder
-					.withPayload(result.getBytes(StandardCharsets.UTF_8))
-					//.setHeader(SEMANTIC_SEGMENTATION_HEADER, jsonMaskPixels)
-					.build();
+			Message<byte[]> outputMessage = MessageBuilder.withPayload(result.getBytes(StandardCharsets.UTF_8)).build();
 
-			return outMessage;
+			return outputMessage;
 		};
 	}
 

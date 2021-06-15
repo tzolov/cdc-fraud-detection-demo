@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>fraud-detection-processor</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -18,6 +18,7 @@
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
+		<tensorflow-common.version>1.1.0-SNAPSHOT</tensorflow-common.version>
 	</properties>
 
 	<dependencies>
@@ -40,9 +41,10 @@
 		<dependency>
 			<groupId>org.springframework.cloud.fn</groupId>
 			<artifactId>tensorflow-common</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>${tensorflow-common.version}</version>
 		</dependency>
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -61,7 +63,9 @@
 							org.springframework.cloud.stream.app.processor.fraud.detection.FraudDetectionProcessorConfiguration.class
 						</configClass>
 						<functionDefinition>fraudDetectionFunction</functionDefinition>
-
+						<containerImage>
+							<orgName>tzolov</orgName>
+						</containerImage>
 						<maven>
 							<dependencies>
 								<dependency>

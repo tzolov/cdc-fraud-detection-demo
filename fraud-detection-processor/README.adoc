@@ -33,6 +33,62 @@ The output result is a single json message, that can be either: `{ "detection":"
 == Options
 
 //tag::configuration-properties[]
+$$fraud.detection.processor.model$$:: $$Pre-trained (frozen) Tensorflow model URI. The http://, file:// and classpath:// URI schemas are supported.$$ *($$String$$, default: `$$classpath:/fraud_detection_graph.pb$$`)*
+$$fraud.detection.processor.model-cached$$:: $$When enabled keeps a local copy (cache) of the model (protobuf) files extracted from the URI archive.$$ *($$Boolean$$, default: `$$true$$`)*
 //end::configuration-properties[]
 
 //end::ref-doc[]
+
+== Build
+
+Build jar:
+
+```
+./mvnw clean install
+```
+
+Build container image:
+
+```
+./mvnw clean install jib:dockerBuild -f apps/fraud-detection-processor-kafka/
+
+./mvnw clean install jib:dockerBuild -f apps/fraud-detection-processor-rabbit/
+```
+
+Publish container images:
+
+```
+docker push tzolov/fraud-detection-processor-kafka:<VERSION-TAG>
+```
+
+Replace the `VERSION-TAG` with the current app version.
+
+You can publish the image directly with the JIB plugin:
+
+```
+./mvnw clean install jib:build -f apps/fraud-detection-processor-kafka/
+```
+
+You can change the `tzolov` prefix to your organization by changing the:
+
+```xml
+			<plugin>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dataflow-apps-generator-plugin</artifactId>
+				<configuration>
+					<application>
+                        ....
+						<containerImage>
+							<orgName>CHANGE-TO-YOUR-ORG-NAME</orgName>
+						</containerImage>
+                        ...
+                    </application>
+                </configuration>
+            </plugin>
+```
+
+Generate processor documentation:
+
+```
+./mvnw clean install -U -Pfull -Pspring
+```

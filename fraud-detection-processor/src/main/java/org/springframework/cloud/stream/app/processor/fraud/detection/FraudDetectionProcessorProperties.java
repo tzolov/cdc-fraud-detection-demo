@@ -26,23 +26,29 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class FraudDetectionProcessorProperties {
 
-	private final Tensorflow tensorflow = new Tensorflow();
+	/**
+	 * Pre-trained (frozen) Tensorflow model URI. The http://, file:// and classpath:// URI schemas are supported.
+	 */
+	private String model = "classpath:/fraud_detection_graph.pb";
 
-	/** Tensorflow configuration.*/
-	public Tensorflow getTensorflow() {
-		return tensorflow;
+	/**
+	 * When enabled keeps a local copy (cache) of the model (protobuf) files extracted from the URI archive.
+	 */
+	private boolean modelCached = true;
+
+	public String getModel() {
+		return model;
 	}
 
-	public static class Tensorflow {
+	public void setModel(String model) {
+		this.model = model;
+	}
 
-		private String modelUri = "classpath:/fraud_detection_graph.pb";
+	public boolean isModelCached() {
+		return modelCached;
+	}
 
-		public String getModelUri() {
-			return modelUri;
-		}
-
-		public void setModelUri(String modelUri) {
-			this.modelUri = modelUri;
-		}
+	public void setModelCached(boolean modelCached) {
+		this.modelCached = modelCached;
 	}
 }
