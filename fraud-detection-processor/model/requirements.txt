@@ -1,0 +1,6 @@
+pandas
+numpy
+seaborn
+psutil
+tensorflow=1.14
+sklearn

@@ -1,0 +1,38 @@
+//tag::ref-doc[]
+
+= Semantic Segmentation Processor
+
+Custom https://github.com/spring-cloud/stream-applications[Spring Cloud Stream Application] that leverages the https://github.com/spring-cloud/stream-applications/tree/main/functions/common/tensorflow-common[TensorFlow Function] to support a specific Tensorflow model build for the https://www.kaggle.com/currie32/predicting-fraud-with-tensorflow[Credit Card Fraud Detection] solution.
+
+Project bundles a pre-trained, binary model at https://github.com/tzolov/cdc-fraud-detection-demo/blob/master/fraud-detection-processor/src/main/resources/fraud_detection_graph.pb[fraud_detection_graph.pb]. To (re)train the model you can use the following python script: https://github.com/tzolov/cdc-fraud-detection-demo/blob/master/fraud-detection-processor/model/train-model.py[train-model.py].
+Later is a direct copy of the https://www.kaggle.com/currie32/predicting-fraud-with-tensorflow[original Kaggle solution], customized to export the trained model in a Protobuf `fraud_detection_graph.pb` file.
+
+The Fraud Detection Processor expects an input JSON messages in the following format:
+
+```
+{
+ "time":453,
+ "v1":1.13154130503628,
+ "v2":-0.174361326933011,
+ ... ,
+ "v28":0.034254726765817,
+ "amount":52.4
+ }
+```
+
+This format strictly matches the column names that types of the original dataset: https://www.kaggle.com/mlg-ulb/creditcardfraud
+
+Because the fraud/normal status of the input transaction is unknown in advance, remove the `Class` column!
+Instead, the fraud-detection processor evaluates result using the pre-trained Tensorflow model.
+The output result is a single json message, that can be either: `{ "detection":"FRAUD" }` or `{ "detection":"NORMAL" }`
+
+
+=== Payload
+
+
+== Options
+
+//tag::configuration-properties[]
+//end::configuration-properties[]
+
+//end::ref-doc[]
